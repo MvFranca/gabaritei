@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import { useState } from "react";
-import { useRouter } from 'expo-router';
+import { useRouter } from "expo-router";
 import {
   StyleSheet,
   Text,
@@ -13,6 +13,7 @@ import {
   Platform,
   Pressable,
   Image,
+  ActivityIndicator,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { FontAwesome } from "@expo/vector-icons";
@@ -20,12 +21,16 @@ import { Stack, useNavigation } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { theme } from "@/src/theme";
+import { useLogin } from "@/src/hooks/auth/useLogin";
+
+const defaultError = "Email ou senha incorretos";
 
 export default function LoginScreen() {
-  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+
+  const { handleLogin, error, loading } = useLogin();
 
   return (
     <SafeAreaView style={styles.container}>
@@ -47,36 +52,50 @@ export default function LoginScreen() {
         />
 
         <View style={styles.formContainer}>
-          <View style={styles.inputContainer}>
-            <TextInput
-              style={styles.input}
-              placeholder="Digite seu usuário ou E-mail"
-              value={email}
-              onChangeText={setEmail}
-              autoCapitalize="none"
-            />
+          <View style={styles.containersInput}>
+            <View style={styles.inputContainer}>
+              <TextInput
+                style={styles.input}
+                placeholder="Digite seu usuário ou E-mail"
+                value={email}
+                onChangeText={setEmail}
+                autoCapitalize="none"
+              />
+            </View>
+            <View style={styles.inputContainer}>
+              <TextInput
+                style={styles.passwordInput}
+                placeholder="Senha"
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry={!showPassword}
+                autoCapitalize="none"
+              />
+              <Pressable
+                style={styles.eyeIcon}
+                onPress={() => setShowPassword(!showPassword)}
+              >
+                <Ionicons
+                  name={showPassword ? "eye-off-outline" : "eye-outline"}
+                  size={24}
+                  color="#999"
+                />
+              </Pressable>
+            </View>
           </View>
 
-          <View style={styles.inputContainer}>
-            <TextInput
-              style={styles.passwordInput}
-              placeholder="Senha"
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry={!showPassword}
-              autoCapitalize="none"
-            />
-            <Pressable
-              style={styles.eyeIcon}
-              onPress={() => setShowPassword(!showPassword)}
+          {error && (
+            <Text
+              style={{
+                color: "red",
+                marginTop: 10,
+                textAlign: "left",
+                fontWeight: "bold",
+              }}
             >
-              <Ionicons
-                name={showPassword ? "eye-off-outline" : "eye-outline"}
-                size={24}
-                color="#999"
-              />
-            </Pressable>
-          </View>
+              {defaultError}
+            </Text>
+          )}
 
           <TouchableOpacity
             activeOpacity={0.7}
@@ -85,13 +104,24 @@ export default function LoginScreen() {
             <Text style={styles.forgotPasswordText}>Esqueceu sua senha?</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.loginButton}
-            activeOpacity={0.7}
-            onPress={() => router.push('/quiz')}
+          <View
+            style={{
+              flexDirection: "column",
+              marginBottom: 20,
+            }}
           >
-            <Text style={styles.loginButtonText}>AVANÇAR</Text>
-          </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.loginButton}
+              activeOpacity={0.7}
+              onPress={() => handleLogin({ email, password })}
+            >
+              {loading ? (
+                <ActivityIndicator color={"#fff"} />
+              ) : (
+                <Text style={styles.loginButtonText}>AVANÇAR</Text>
+              )}
+            </TouchableOpacity>
+          </View>
 
           <View style={styles.socialLoginContainer}>
             <Text style={styles.socialLoginText}>Ou realize o login com:</Text>
@@ -155,9 +185,11 @@ const styles = StyleSheet.create({
   formContainer: {
     width: "100%",
   },
+  containersInput: {
+    gap: 12,
+  },
   inputContainer: {
     width: "100%",
-    marginBottom: 15,
     position: "relative",
     height: 45,
   },
@@ -198,7 +230,6 @@ const styles = StyleSheet.create({
     height: 45,
     justifyContent: "center",
     alignItems: "center",
-    marginBottom: 20,
     marginTop: 16,
   },
   loginButtonText: {
