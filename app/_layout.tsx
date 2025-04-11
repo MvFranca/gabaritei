@@ -1,10 +1,29 @@
 import { apolloClient } from "@/src/api/apollo";
 import { ApolloProvider } from "@apollo/client";
-import { Slot } from "expo-router";
+import { router, Slot } from "expo-router";
 import { StatusBar } from "expo-status-bar";
+import { useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import * as SecureStore from 'expo-secure-store';
 
 export default function RootLayout() {
+
+
+  useEffect(() => {
+    const checkToken = async () => {
+      const token = await SecureStore.getItemAsync('token');
+
+      if (token) {
+        router.replace('/quiz'); 
+      } else {
+        router.replace('/login'); 
+      }
+    };
+
+    checkToken();
+  }, []);
+
+
   return (
     <ApolloProvider client={apolloClient}>
       <GestureHandlerRootView style={{ flex: 1 }}>

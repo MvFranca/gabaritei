@@ -1,33 +1,34 @@
-import React, { useEffect, useRef } from "react";
-import { View, Animated, LayoutChangeEvent } from "react-native";
-import { StyleSheet } from "react-native";
+import React, { useEffect, useRef, useState } from "react";
+import { View, Animated, LayoutChangeEvent, StyleSheet } from "react-native";
 import { theme } from "@/src/theme";
 
 type Props = {
-  progress: number;
+  progress: number; // valor de 0 a 1
 };
 
 export function ProgressBar({ progress }: Props) {
   const animatedValue = useRef(new Animated.Value(0)).current;
-  const width = useRef(0);
+  const [containerWidth, setContainerWidth] = useState(0);
 
   useEffect(() => {
-    Animated.timing(animatedValue, {
-      toValue: progress,
-      duration: 500,
-      useNativeDriver: false,
-    }).start();
-  }, [progress]);
+    if (containerWidth > 0) {
+      Animated.timing(animatedValue, {
+        toValue: progress,
+        duration: 500,
+        useNativeDriver: false,
+      }).start();
+    }
+  }, [progress, containerWidth]);
+
+  const onLayout = (event: LayoutChangeEvent) => {
+    setContainerWidth(event.nativeEvent.layout.width);
+  };
 
   const animatedWidth = animatedValue.interpolate({
     inputRange: [0, 1],
-    outputRange: [0, width.current],
+    outputRange: [0, containerWidth],
     extrapolate: "clamp",
   });
-
-  const onLayout = (event: LayoutChangeEvent) => {
-    width.current = event.nativeEvent.layout.width;
-  };
 
   return (
     <View style={styles.container} onLayout={onLayout}>
@@ -38,9 +39,7 @@ export function ProgressBar({ progress }: Props) {
 
 const styles = StyleSheet.create({
   container: {
-    maxHeight: 25,
     height: 25,
-    flex:1,
     borderRadius: 20,
     backgroundColor: "#D9D9D9",
     overflow: "hidden",

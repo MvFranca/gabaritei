@@ -14,7 +14,7 @@ export function QuizHeader() {
         style={styles.logo}
       />
 
-      <TouchableOpacity onPress={() => router.back()}>
+      <TouchableOpacity onPress={() => router.push('/home')}>
         <Icon color="#000" size={24} name="close" />
       </TouchableOpacity>
     </View>

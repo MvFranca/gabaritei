@@ -1,4 +1,3 @@
-// src/hooks/useLogin.ts
 import { useMutation } from '@apollo/client';
 import { router } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';

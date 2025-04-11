@@ -84,9 +84,7 @@ export const SortableItem: React.FC<SortableItemProps> = ({
 
 const styles = StyleSheet.create({
   itemContainer: {
-    minHeight: 70 - 10 ,
-    marginHorizontal: 16,
-    marginVertical: 5,
+    minHeight: 60 ,
     borderRadius: 8,
     justifyContent: "center",
     paddingLeft: 16,
