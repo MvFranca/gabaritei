@@ -33,7 +33,7 @@ export const SortableItem: React.FC<SortableItemProps> = ({
         offsetY.value = positions.value.indexOf(index) * ITEM_HEIGHT;
       },
       onActive: (event) => {
-        offsetY.value = event.absoluteY + ITEM_HEIGHT - 200;
+        offsetY.value = event.absoluteY + ITEM_HEIGHT - 350;
 
         const newPosition = clamp(
           Math.floor(offsetY.value / ITEM_HEIGHT),
@@ -84,13 +84,13 @@ export const SortableItem: React.FC<SortableItemProps> = ({
 
 const styles = StyleSheet.create({
   itemContainer: {
-    minHeight: ITEM_HEIGHT - 10,
+    minHeight: 70 - 10 ,
     marginHorizontal: 16,
     marginVertical: 5,
     borderRadius: 8,
-    backgroundColor: theme.colors.surface,
     justifyContent: "center",
     paddingLeft: 16,
+    backgroundColor: theme.colors.surface,
     elevation: 3,
   },
   itemText: {

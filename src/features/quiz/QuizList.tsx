@@ -1,25 +1,28 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
-import { useSharedValue, runOnJS } from 'react-native-reanimated';
-import { StyleSheet, Dimensions } from 'react-native';
-import { Item } from '@/src/types/quiz.types';
-import { SortableItem } from './SortableItem';
-import { theme } from '@/src/theme';
+import React, { useEffect, useState } from "react";
+import { View, Text, TouchableOpacity } from "react-native";
+import { useSharedValue, runOnJS } from "react-native-reanimated";
+import { StyleSheet, Dimensions } from "react-native";
+import { Item } from "@/src/types/quiz.types";
+import { SortableItem } from "./SortableItem";
+import { theme } from "@/src/theme";
+import { ProgressBar } from "@/src/components/progressBar";
 
-export const { height: SCREEN_HEIGHT } = Dimensions.get('window');
+export const { height: SCREEN_HEIGHT } = Dimensions.get("window");
 export const ITEM_HEIGHT = 70;
 
 export const QuizList = () => {
   const initialData: Item[] = [
-    { key: '1', title: 'Matemática Financeira' },
-    { key: '2', title: 'Estatística e Probabilidade' },
-    { key: '3', title: 'Álgebra' },
-    { key: '4', title: 'Geometria' },
-    { key: '5', title: 'Cálculo' },
+    { key: "1", title: "Matemática Financeira" },
+    { key: "2", title: "Estatística e Probabilidade" },
+    { key: "3", title: "Álgebra" },
+    { key: "4", title: "Geometria" },
+    { key: "5", title: "Cálculo" },
   ];
-  
+
+  const [progress, setProgress] = useState(40);
+
   const [items, setItems] = useState<Item[]>(initialData);
-  
+
   const positions = useSharedValue<number[]>(initialData.map((_, i) => i));
 
   const move = (from: number, to: number) => {
@@ -29,12 +32,13 @@ export const QuizList = () => {
     positions.value = newPositions;
   };
 
-  const getOrder = () => positions.value.map(i => items[i].key);
+  const getOrder = () => positions.value.map((i) => items[i].key);
 
   return (
     <View style={styles.container}>
+      <ProgressBar progress={progress} />
       <Text style={styles.instructions}>
-        Ordene os conteúdos que você tem mais dificuldade em{' '}
+        Ordene os conteúdos que você tem mais dificuldade em{" "}
         <Text style={styles.question}>matemática.</Text>
       </Text>
 
@@ -53,7 +57,7 @@ export const QuizList = () => {
 
       <TouchableOpacity
         style={styles.button}
-        onPress={() => console.log('Nova ordem:', getOrder())}
+        onPress={() => console.log("Nova ordem:", getOrder())}
       >
         <Text style={styles.buttonText}>AVANÇAR</Text>
       </TouchableOpacity>
@@ -71,24 +75,25 @@ export const styles = StyleSheet.create({
     fontSize: 18,
     marginBottom: 12,
     paddingHorizontal: 16,
+    marginTop: 16,
   },
   question: {
     color: theme.colors.primary,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   itemText: {
     fontSize: 16,
-    color: '#333',
+    color: "#333",
   },
   button: {
     backgroundColor: theme.colors.primary,
     padding: 12,
     borderRadius: 8,
     margin: 16,
-    alignItems: 'center',
+    alignItems: "center",
   },
   buttonText: {
     color: theme.colors.surface,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
 });
