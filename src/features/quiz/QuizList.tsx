@@ -7,6 +7,7 @@ import { SortableItem } from "./SortableItem";
 import { theme } from "@/src/theme";
 import { ProgressBar } from "@/src/components/progressBar";
 import { useQuizOnboarding } from "@/src/hooks/onboarding/useQuizOnboarding";
+import ErrorComponent from "@/src/components/error";
 
 export const { height: SCREEN_HEIGHT } = Dimensions.get("window");
 export const ITEM_HEIGHT = 70;
@@ -72,9 +73,7 @@ export const QuizList = () => {
 
   if (error) {
     return (
-      <View style={styles.loadingContainer}>
-        <Text>Erro ao carregar os dados. Tente novamente.</Text>
-      </View>
+      <ErrorComponent/>
     );
   }
 

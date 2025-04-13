@@ -8,7 +8,7 @@ export const colors = {
     background: '#f5f5f5',
     surface: '#ffffff',
     error: '#b00020',
-    textPrimary: '#000000',
+    textPrimary: '#2C2C2C',
     textSecondary: '#ffffff',
     disabled: '#f5f5f5',
     placeholder: '#a1a1a1',
