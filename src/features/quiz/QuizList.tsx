@@ -19,9 +19,12 @@ export const QuizList = () => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const positions = useSharedValue<number[]>([]);
 
-  const [questionIndex, setQuestionIndex] = useState(0);
+  const [orderedAnswers, setOrderedAnswers] = useState<
+    { name: string; options: string[] }[]
+  >([]);
+
   const totalQuestions = data?.questions?.length || 1;
-  const progress = (questionIndex + 1) / totalQuestions;
+  const progress = (currentQuestionIndex + 1) / totalQuestions;
 
   useEffect(() => {
     handleGetQuestions();
@@ -40,7 +43,7 @@ export const QuizList = () => {
       }));
 
       setItems(mappedItems);
-      positions.value = mappedItems.map((_: string, i: number): number => i);
+      positions.value = mappedItems.map((_:any, i: number): number => i);
     }
   }, [data, currentQuestionIndex]);
 
@@ -54,14 +57,34 @@ export const QuizList = () => {
   const getOrder = () => positions.value.map((i) => items[i].key);
 
   const handleNext = () => {
-    console.log("Nova ordem:", getOrder());
+    const currentQuestion = data.questions[currentQuestionIndex];
+    const orderedOptionTitles = getOrder().map(
+      key => items.find(item => item.key === key)?.title || ""
+    );
+
+    setOrderedAnswers(prev => [
+      ...prev,
+      {
+        name: currentQuestion.name,
+        options: orderedOptionTitles,
+      },
+    ]);
 
     if (currentQuestionIndex < totalQuestions - 1) {
-      setCurrentQuestionIndex((prev) => prev + 1);
+      setCurrentQuestionIndex(prev => prev + 1);
     } else {
-      console.log("Quiz finalizado");
+      console.log("Quiz finalizado!");
+      console.log("Respostas ordenadas:", orderedAnswers);
+      // aqui você pode redirecionar ou salvar no banco
     }
   };
+
+  useEffect(() => {
+    if (orderedAnswers.length === totalQuestions) {
+      console.log("Ordem final de dificuldades:", orderedAnswers);
+      // aqui você pode processar a lógica de recomendação, ou salvar os dados
+    }
+  }, [orderedAnswers]);
 
   if (loading) {
     return (
@@ -72,9 +95,7 @@ export const QuizList = () => {
   }
 
   if (error) {
-    return (
-      <ErrorComponent/>
-    );
+    return <ErrorComponent />;
   }
 
   return (
@@ -83,7 +104,7 @@ export const QuizList = () => {
       <Text style={styles.instructions}>
         Ordene os conteúdos que você tem mais dificuldade em{" "}
         <Text style={styles.question}>
-          {data?.questions[questionIndex].name}
+          {data?.questions[currentQuestionIndex].name}
         </Text>
         .
       </Text>
@@ -91,15 +112,8 @@ export const QuizList = () => {
       <View style={{ gap: 8, flexDirection: "row", paddingHorizontal: 16 }}>
         <View style={styles.positionsContainer}>
           {items.map((_, index: number) => (
-            <View key={index} style={[styles.position]}>
-              <Text
-                style={{
-                  color: theme.colors.primary,
-                  fontWeight: "bold",
-                }}
-              >
-                {index + 1}
-              </Text>
+            <View key={index} style={styles.position}>
+              <Text style={styles.positionText}>{index + 1}</Text>
             </View>
           ))}
         </View>
@@ -117,27 +131,7 @@ export const QuizList = () => {
         </View>
       </View>
 
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => {
-          console.log("Nova ordem:", getOrder());
-          if (questionIndex < totalQuestions - 1) {
-            const nextOptions = data.questions[questionIndex + 1].options;
-            const mappedItems = nextOptions.map(
-              (title: string, index: number) => ({
-                key: String(index + 1),
-                title,
-              })
-            );
-
-            setItems(mappedItems);
-            positions.value = mappedItems.map((_: string, i: number): number => i);
-            setQuestionIndex((prev) => prev + 1);
-          } else {
-            console.log("Fim do quiz");
-          }
-        }}
-      >
+      <TouchableOpacity style={styles.button} onPress={handleNext}>
         <Text style={styles.buttonText}>AVANÇAR</Text>
       </TouchableOpacity>
     </View>
@@ -166,6 +160,10 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.surface,
     elevation: 3,
   },
+  positionText: {
+    color: theme.colors.primary,
+    fontWeight: "bold",
+  },
   loadingContainer: {
     flex: 1,
     justifyContent: "center",
@@ -186,9 +184,9 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     height: 42,
     alignItems: "center",
-    justifyContent: 'center',
+    justifyContent: "center",
     width: Dimensions.get("window").width - 32,
-    position: 'absolute',
+    position: "absolute",
     left: 16,
     bottom: 16,
   },
