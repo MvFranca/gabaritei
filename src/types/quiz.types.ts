@@ -12,3 +12,8 @@ export interface SortableItemProps {
   dataLength: number;
   onSwap: (from: number, to: number) => void;
 }
+
+export type OrderedAnswer = {
+  name: string;
+  options: string[];
+};

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { memo, useMemo } from "react";
 import { StyleSheet, Text } from "react-native";
 import Animated, {
   useAnimatedGestureHandler,
@@ -7,16 +7,22 @@ import Animated, {
   withSpring,
   runOnJS,
   clamp,
+  useDerivedValue,
 } from "react-native-reanimated";
 import {
   PanGestureHandler,
   PanGestureHandlerGestureEvent,
 } from "react-native-gesture-handler";
 import { SortableItemProps } from "@/src/types/quiz.types";
-import { ITEM_HEIGHT } from "./QuizList";
+import { ITEM_HEIGHT } from "../features/quiz/QuizList";
 import { theme } from "@/src/theme";
 
-export const SortableItem: React.FC<SortableItemProps> = ({
+const SPRING_CONFIG = {
+  damping: 15,
+  stiffness: 150,
+};
+
+const SortableItemComponent: React.FC<SortableItemProps> = ({
   item,
   index,
   positions,
@@ -24,16 +30,20 @@ export const SortableItem: React.FC<SortableItemProps> = ({
   onSwap,
 }) => {
   const isGestureActive = useSharedValue(false);
-  const offsetY = useSharedValue(positions.value.indexOf(index) * ITEM_HEIGHT);
+  const offsetY = useSharedValue(0);
+
+  const positionIndex = useDerivedValue(() =>
+    positions.value.findIndex(p => p === index)
+  );
 
   const gestureHandler =
     useAnimatedGestureHandler<PanGestureHandlerGestureEvent>({
       onStart: () => {
         isGestureActive.value = true;
-        offsetY.value = positions.value.indexOf(index) * ITEM_HEIGHT;
+        offsetY.value = positionIndex.value * ITEM_HEIGHT;
       },
       onActive: (event) => {
-        offsetY.value = event.absoluteY + ITEM_HEIGHT - 350;
+        offsetY.value = clamp(event.absoluteY - 280, 0, ITEM_HEIGHT * (dataLength - 1));
 
         const newPosition = clamp(
           Math.floor(offsetY.value / ITEM_HEIGHT),
@@ -41,15 +51,12 @@ export const SortableItem: React.FC<SortableItemProps> = ({
           dataLength - 1
         );
 
-        const currentPosition = positions.value.indexOf(index);
+        const currentPosition = positionIndex.value;
         if (newPosition !== currentPosition) {
           runOnJS(onSwap)(currentPosition, newPosition);
         }
       },
       onEnd: () => {
-        offsetY.value = withSpring(
-          positions.value.indexOf(index) * ITEM_HEIGHT
-        );
         isGestureActive.value = false;
       },
     });
@@ -57,7 +64,7 @@ export const SortableItem: React.FC<SortableItemProps> = ({
   const animatedStyle = useAnimatedStyle(() => {
     const top = isGestureActive.value
       ? offsetY.value
-      : withSpring(positions.value.indexOf(index) * ITEM_HEIGHT);
+      : withSpring(positionIndex.value * ITEM_HEIGHT, SPRING_CONFIG);
 
     return {
       position: "absolute",
@@ -67,7 +74,7 @@ export const SortableItem: React.FC<SortableItemProps> = ({
       zIndex: isGestureActive.value ? 100 : 0,
       transform: [
         {
-          scale: withSpring(isGestureActive.value ? 1.05 : 1),
+          scale: withSpring(isGestureActive.value ? 1.05 : 1, SPRING_CONFIG),
         },
       ],
     };
@@ -82,9 +89,11 @@ export const SortableItem: React.FC<SortableItemProps> = ({
   );
 };
 
+export const SortableItem = memo(SortableItemComponent);
+
 const styles = StyleSheet.create({
   itemContainer: {
-    minHeight: 60 ,
+    minHeight: 60,
     borderRadius: 8,
     justifyContent: "center",
     paddingLeft: 16,

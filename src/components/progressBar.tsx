@@ -3,7 +3,7 @@ import { View, Animated, LayoutChangeEvent, StyleSheet } from "react-native";
 import { theme } from "@/src/theme";
 
 type Props = {
-  progress: number; // valor de 0 a 1
+  progress: number;
 };
 
 export function ProgressBar({ progress }: Props) {

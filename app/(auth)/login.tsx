@@ -1,7 +1,6 @@
 "use client";
 import React from "react";
 import { useState } from "react";
-import { useRouter } from "expo-router";
 import {
   StyleSheet,
   Text,
@@ -17,9 +16,8 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { FontAwesome } from "@expo/vector-icons";
-import { Stack, useNavigation } from "expo-router";
+import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { theme } from "@/src/theme";
 import { useLogin } from "@/src/hooks/auth/useLogin";
 

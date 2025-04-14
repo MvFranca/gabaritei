@@ -1,13 +1,22 @@
-import React, { useEffect, useState } from "react";
-import { View, Text, TouchableOpacity, ActivityIndicator } from "react-native";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  ActivityIndicator,
+  StyleSheet,
+  Dimensions,
+} from "react-native";
 import { useSharedValue, runOnJS } from "react-native-reanimated";
-import { StyleSheet, Dimensions } from "react-native";
-import { Item } from "@/src/types/quiz.types";
-import { SortableItem } from "./SortableItem";
+import { Item, OrderedAnswer } from "@/src/types/quiz.types";
 import { theme } from "@/src/theme";
 import { ProgressBar } from "@/src/components/progressBar";
 import { useQuizOnboarding } from "@/src/hooks/onboarding/useQuizOnboarding";
 import ErrorComponent from "@/src/components/error";
+import { getOrderedTitles } from "@/src/domain/quiz/getOrderedTitles";
+import { createAnswerEntry } from "@/src/domain/quiz/createAnswerEntry";
+import { saveOrderedAnswer } from "@/src/domain/quiz/saveOrderedAnswer";
+import { SortableItem } from "../../components/sortableItem";
 
 export const { height: SCREEN_HEIGHT } = Dimensions.get("window");
 export const ITEM_HEIGHT = 70;
@@ -18,10 +27,7 @@ export const QuizList = () => {
   const [items, setItems] = useState<Item[]>([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const positions = useSharedValue<number[]>([]);
-
-  const [orderedAnswers, setOrderedAnswers] = useState<
-    { name: string; options: string[] }[]
-  >([]);
+  const [orderedAnswers, setOrderedAnswers] = useState<OrderedAnswer[]>([]);
 
   const totalQuestions = data?.questions?.length || 1;
   const progress = (currentQuestionIndex + 1) / totalQuestions;
@@ -30,6 +36,7 @@ export const QuizList = () => {
     handleGetQuestions();
   }, []);
 
+  //lembrar de refatorar isso daqui
   useEffect(() => {
     if (
       data?.questions?.length &&
@@ -54,37 +61,28 @@ export const QuizList = () => {
     positions.value = newPositions;
   };
 
-  const getOrder = () => positions.value.map((i) => items[i].key);
-
   const handleNext = () => {
     const currentQuestion = data.questions[currentQuestionIndex];
-    const orderedOptionTitles = getOrder().map(
-      key => items.find(item => item.key === key)?.title || ""
-    );
-
-    setOrderedAnswers(prev => [
-      ...prev,
-      {
-        name: currentQuestion.name,
-        options: orderedOptionTitles,
-      },
-    ]);
+    const orderedTitles = getOrderedTitles(items, positions.value);
+    const answerEntry = createAnswerEntry(currentQuestion.name, orderedTitles);
+    const updatedAnswers = saveOrderedAnswer(orderedAnswers, answerEntry);
+    setOrderedAnswers(updatedAnswers);
 
     if (currentQuestionIndex < totalQuestions - 1) {
-      setCurrentQuestionIndex(prev => prev + 1);
+      setCurrentQuestionIndex((prev) => prev + 1);
     } else {
-      console.log("Quiz finalizado!");
-      console.log("Respostas ordenadas:", orderedAnswers);
-      // aqui você pode redirecionar ou salvar no banco
+      console.log("Quiz finalizado");
+      console.log("Respostas ordenadas:", updatedAnswers);
     }
   };
 
-  useEffect(() => {
-    if (orderedAnswers.length === totalQuestions) {
-      console.log("Ordem final de dificuldades:", orderedAnswers);
-      // aqui você pode processar a lógica de recomendação, ou salvar os dados
-    }
-  }, [orderedAnswers]);
+  const handleSwap = useCallback((from: number, to: number) => {
+    runOnJS(move)(from, to);
+  }, []);
+
+  const questionText = useMemo(() => {
+    return data?.questions[currentQuestionIndex].name;
+  }, [data, currentQuestionIndex]);
 
   if (loading) {
     return (
@@ -104,35 +102,42 @@ export const QuizList = () => {
       <Text style={styles.instructions}>
         Ordene os conteúdos que você tem mais dificuldade em{" "}
         <Text style={styles.question}>
-          {data?.questions[currentQuestionIndex].name}
+          {questionText}
         </Text>
         .
       </Text>
 
       <View style={{ gap: 8, flexDirection: "row", paddingHorizontal: 16 }}>
         <View style={styles.positionsContainer}>
-          {items.map((_, index: number) => (
+          {items.map((_, index) => (
             <View key={index} style={styles.position}>
-              <Text style={styles.positionText}>{index + 1}</Text>
+              <Text style={{ color: theme.colors.primary, fontWeight: "bold" }}>
+                {index + 1}
+              </Text>
             </View>
           ))}
         </View>
+
         <View style={{ flex: 1 }}>
-          {items.map((item: Item, index: number) => (
+          {items.map((item, index) => (
             <SortableItem
               key={item.key}
               index={index}
               item={item}
               positions={positions}
               dataLength={items.length}
-              onSwap={(from: number, to: number) => runOnJS(move)(from, to)}
+              onSwap={(from, to) => handleSwap(from, to)}
             />
           ))}
         </View>
       </View>
 
       <TouchableOpacity style={styles.button} onPress={handleNext}>
-        <Text style={styles.buttonText}>AVANÇAR</Text>
+        <Text style={styles.buttonText}>
+          {currentQuestionIndex == totalQuestions - 1
+            ? "FINALIZAR"
+            : "AVANÇAR"}
+        </Text>
       </TouchableOpacity>
     </View>
   );
@@ -155,14 +160,9 @@ const styles = StyleSheet.create({
     minHeight: 60,
     justifyContent: "center",
     alignItems: "center",
-    gap: 8,
     borderRadius: 8,
     backgroundColor: theme.colors.surface,
     elevation: 3,
-  },
-  positionText: {
-    color: theme.colors.primary,
-    fontWeight: "bold",
   },
   loadingContainer: {
     flex: 1,

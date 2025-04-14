@@ -1,4 +1,4 @@
-import { apolloClient } from "@/src/api/apollo";
+import { apolloClient } from "@/api/apollo";
 import { ApolloProvider } from "@apollo/client";
 import { router, Slot } from "expo-router";
 import { StatusBar } from "expo-status-bar";

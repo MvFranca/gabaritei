@@ -1,5 +1,5 @@
 import { useLazyQuery } from '@apollo/client';
-import { ONBOARDING_QUIZ } from '@/src/api/onboarding/mutations';
+import { ONBOARDING_QUIZ } from '@/api/onboarding/mutations';
 
 export function useQuizOnboarding() {
   const [getQuestions, { data, loading, error }] = useLazyQuery(ONBOARDING_QUIZ);
