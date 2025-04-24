@@ -1,4 +1,3 @@
-// components/TabBar.tsx
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { tabBarItems } from '../utils/tabBar';

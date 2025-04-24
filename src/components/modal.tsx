@@ -1,3 +1,4 @@
+// Modal.tsx
 import React, { useEffect, useRef } from "react";
 import {
   View,
@@ -11,7 +12,6 @@ import {
   TouchableWithoutFeedback,
 } from "react-native";
 import { theme } from "../theme";
-
 import { BlurView } from "expo-blur";
 
 type ModalProps = {
@@ -23,6 +23,7 @@ type ModalProps = {
   secondaryButtonText?: string;
   onSecondaryPress?: (event: GestureResponderEvent) => void;
   onRequestClose?: () => void;
+  children?: React.ReactNode;
 };
 
 const Modal: React.FC<ModalProps> = ({
@@ -34,6 +35,7 @@ const Modal: React.FC<ModalProps> = ({
   secondaryButtonText,
   onSecondaryPress,
   onRequestClose,
+  children,
 }) => {
   const opacity = useRef(new Animated.Value(0)).current;
   const scale = useRef(new Animated.Value(0.8)).current;
@@ -82,7 +84,7 @@ const Modal: React.FC<ModalProps> = ({
 
   return (
     <TouchableWithoutFeedback onPress={handleOutsidePress}>
-      <BlurView intensity={90}  tint="dark" style={styles.container} >
+      <BlurView intensity={90} tint="dark" style={styles.container}>
         <TouchableWithoutFeedback>
           <Animated.View
             style={[
@@ -93,35 +95,41 @@ const Modal: React.FC<ModalProps> = ({
               },
             ]}
           >
-            {title && <Text style={styles.title}>{title}</Text>}
-            {subtitle && <Text style={styles.subtitle}>{subtitle}</Text>}
-            {imageSource && (
-              <Image
-                source={imageSource}
-                style={styles.image}
-                resizeMode="contain"
-              />
+            {children ? (
+              children
+            ) : (
+              <>
+                {title && <Text style={styles.title}>{title}</Text>}
+                {subtitle && <Text style={styles.subtitle}>{subtitle}</Text>}
+                {imageSource && (
+                  <Image
+                    source={imageSource}
+                    style={styles.image}
+                    resizeMode="contain"
+                  />
+                )}
+                <View style={styles.buttonContainer}>
+                  {primaryButtonText && (
+                    <TouchableOpacity
+                      style={styles.primaryButton}
+                      onPress={handleButtonClose(onPrimaryPress)}
+                    >
+                      <Text style={styles.primaryText}>{primaryButtonText}</Text>
+                    </TouchableOpacity>
+                  )}
+                  {secondaryButtonText && (
+                    <TouchableOpacity
+                      style={styles.secondaryButton}
+                      onPress={handleButtonClose(onSecondaryPress)}
+                    >
+                      <Text style={styles.secondaryText}>
+                        {secondaryButtonText}
+                      </Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
+              </>
             )}
-            <View style={styles.buttonContainer}>
-              {primaryButtonText && (
-                <TouchableOpacity
-                  style={styles.primaryButton}
-                  onPress={handleButtonClose(onPrimaryPress)}
-                >
-                  <Text style={styles.primaryText}>{primaryButtonText}</Text>
-                </TouchableOpacity>
-              )}
-              {secondaryButtonText && (
-                <TouchableOpacity
-                  style={styles.secondaryButton}
-                  onPress={handleButtonClose(onSecondaryPress)}
-                >
-                  <Text style={styles.secondaryText}>
-                    {secondaryButtonText}
-                  </Text>
-                </TouchableOpacity>
-              )}
-            </View>
           </Animated.View>
         </TouchableWithoutFeedback>
       </BlurView>
@@ -130,6 +138,7 @@ const Modal: React.FC<ModalProps> = ({
 };
 
 export default Modal;
+
 
 const styles = StyleSheet.create({
   container: {

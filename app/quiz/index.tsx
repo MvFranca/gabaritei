@@ -1,4 +1,4 @@
-import { QuizHeader } from "@/src/components/header";
+import { QuizHeader } from "@/src/components/headers/header";
 import Modal from "@/src/components/modal";
 import { QuizList } from "@/src/features/quiz/QuizList";
 import { theme } from "@/src/theme";
