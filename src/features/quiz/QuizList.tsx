@@ -21,7 +21,11 @@ import { SortableItem } from "../../components/sortableItem";
 export const { height: SCREEN_HEIGHT } = Dimensions.get("window");
 export const ITEM_HEIGHT = 70;
 
-export const QuizList = () => {
+interface QuizProps {
+  finished?: () => void;
+}
+
+export const QuizList: React.FC<QuizProps> = ({finished}) => {
   const { data, error, handleGetQuestions, loading } = useQuizOnboarding();
 
   const [items, setItems] = useState<Item[]>([]);
@@ -50,7 +54,7 @@ export const QuizList = () => {
       }));
 
       setItems(mappedItems);
-      positions.value = mappedItems.map((_:any, i: number): number => i);
+      positions.value = mappedItems.map((_: any, i: number): number => i);
     }
   }, [data, currentQuestionIndex]);
 
@@ -101,10 +105,7 @@ export const QuizList = () => {
       <ProgressBar progress={progress} />
       <Text style={styles.instructions}>
         Ordene os conteúdos que você tem mais dificuldade em{" "}
-        <Text style={styles.question}>
-          {questionText}
-        </Text>
-        .
+        <Text style={styles.question}>{questionText}</Text>.
       </Text>
 
       <View style={{ gap: 8, flexDirection: "row", paddingHorizontal: 16 }}>
@@ -131,14 +132,17 @@ export const QuizList = () => {
           ))}
         </View>
       </View>
-
-      <TouchableOpacity style={styles.button} onPress={handleNext}>
-        <Text style={styles.buttonText}>
-          {currentQuestionIndex == totalQuestions - 1
-            ? "FINALIZAR"
-            : "AVANÇAR"}
-        </Text>
-      </TouchableOpacity>
+      {currentQuestionIndex == totalQuestions - 1 ? (
+        <TouchableOpacity style={styles.button} onPress={finished}>
+          <Text style={styles.buttonText}>FINALIZAR</Text>
+        </TouchableOpacity>
+      ) : (
+        <TouchableOpacity style={styles.button} onPress={handleNext}>
+          <Text style={styles.buttonText}>
+            CONTINUAR
+          </Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
 };

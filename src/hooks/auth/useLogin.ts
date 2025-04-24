@@ -17,7 +17,7 @@ export function useLogin() {
       console.log('token', token);
 
       if (token) {
-        await SecureStore.setItem('token', token);
+        SecureStore.setItem('token', token);
         router.replace('/quiz');
       }
     } catch (e) {

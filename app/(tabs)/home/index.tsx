@@ -1,3 +1,4 @@
+import TabBar from "@/src/components/tabBar";
 import { Text, View } from "react-native";
 
 const Home = () => {
@@ -6,6 +7,7 @@ const Home = () => {
             <Text>
                 Home
             </Text>
+
         </View>
      );
 }
