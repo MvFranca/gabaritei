@@ -14,7 +14,7 @@ export default function RootLayout() {
       const token = await SecureStore.getItemAsync('token');
 
       if (token) {
-        router.replace('/quiz'); 
+        router.replace('/home'); 
       } else {
         router.replace('/login'); 
       }

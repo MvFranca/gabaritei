@@ -1,11 +1,9 @@
 import { View, Image, TouchableOpacity, StyleSheet } from "react-native";
-import { useRouter } from "expo-router";
 import Icon from "@expo/vector-icons/MaterialIcons";
 
 import { theme } from "@/src/theme";
 
-export function QuizHeader() {
-  const router = useRouter();
+export function QuizHeader({onPress}: { onPress?: () => void }) {
 
   return (
     <View style={styles.container}>
@@ -14,7 +12,7 @@ export function QuizHeader() {
         style={styles.logo}
       />
 
-      <TouchableOpacity onPress={() => router.push('/home')}>
+      <TouchableOpacity onPress={onPress}>
         <Icon color="#000" size={24} name="close" />
       </TouchableOpacity>
     </View>
