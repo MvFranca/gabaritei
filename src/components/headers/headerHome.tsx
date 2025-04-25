@@ -71,6 +71,7 @@ const HeaderHome = () => {
       <BottomSheetCustom
         isOpen={isSheetOpen}
         onClose={() => setIsSheetOpen(false)}
+
       >
         <View style={styles.bottomSheetHeaderContainer}>
           <MaterialCommunityIcons
@@ -120,24 +121,25 @@ const HeaderHome = () => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    width: Dimensions.get('window').width,
-    height: 114,
-    backgroundColor: theme.colors.surface,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingTop: 40,
-    elevation: 5,
-    shadowColor: theme.colors.textPrimary,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-  },
+container: {
+  position: 'absolute',
+  top: 0,
+  left: 0,
+  width: Dimensions.get('window').width,
+  height: 114,
+  backgroundColor: theme.colors.surface,
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  paddingHorizontal: 16,
+  paddingTop: 40,
+  elevation: 5,
+  shadowColor: theme.colors.textPrimary,
+  shadowOffset: { width: 0, height: 2 },
+  shadowOpacity: 0.1,
+  shadowRadius: 4,
+},
+
   iconButton: {
     backgroundColor: theme.colors.surface,
     borderRadius: 8,
@@ -184,7 +186,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 8,
     alignItems: 'center',
-    marginBottom: 16,
+    marginVertical: 16,
   },
   sheetTitle: {
     fontSize: 16,

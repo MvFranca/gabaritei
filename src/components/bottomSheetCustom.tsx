@@ -26,6 +26,7 @@ const BottomSheetCustom = ({ children, isOpen, onClose }: Props) => {
       disappearsOnIndex={-1}
       appearsOnIndex={0}
       pressBehavior="close"
+      style={StyleSheet.absoluteFillObject}
     />
   ), []);
 
@@ -49,20 +50,20 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.surface,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
-    elevation: 5,
+    elevation: 10, // aumento para sobrepor o backdrop se necessário
     shadowColor: theme.colors.textPrimary,
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.9,
-    shadowRadius: 4,
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
   },
   indicator: {
     backgroundColor: '#ccc',
     width: 40,
   },
   content: {
-    flex: 1,
     paddingHorizontal: 20,
     paddingTop: 10,
+    zIndex: 999, // certifique-se que está no topo
   },
 });
 
