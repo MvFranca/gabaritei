@@ -13,3 +13,17 @@ export const LOGIN_USER = gql`
     }
   }
 `;
+
+export const REGISTER_USER = gql`
+  mutation Signin($input: SignupInput!) {
+    signup(input: $input) {
+      token
+      message
+      user {
+        id
+        email
+        name
+      }
+    }
+  }
+`;

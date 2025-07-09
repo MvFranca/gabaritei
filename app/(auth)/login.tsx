@@ -19,6 +19,7 @@ import { useLogin } from "@/src/hooks/auth/useLogin";
 import { useZodForm } from "@/src/hooks/form/useZodForm";
 import { loginSchema } from "@/src/schemas/loginSchema";
 import { FormInput } from "@/src/ds/FormInput";
+import { router } from "expo-router";
 
 const defaultError = "Email ou senha incorretos";
 
@@ -32,7 +33,6 @@ export default function LoginScreen() {
     formState: { errors },
   } = useZodForm(loginSchema);
 
-
   useEffect(() => {
     if (showError) {
       const timeout = setTimeout(() => {
@@ -42,7 +42,6 @@ export default function LoginScreen() {
     }
     setShowError(true);
   }, [error]);
-
 
   return (
     <SafeAreaView style={styles.container}>
@@ -74,7 +73,9 @@ export default function LoginScreen() {
               showToggleVisibility
             />
           </View>
-          {showError && error && <Text style={styles.generalErrorText}>{defaultError}</Text>}
+          {showError && error && (
+            <Text style={styles.generalErrorText}>{defaultError}</Text>
+          )}
 
           <TouchableOpacity
             activeOpacity={0.7}
@@ -91,7 +92,7 @@ export default function LoginScreen() {
             {loading ? (
               <ActivityIndicator color={"#fff"} />
             ) : (
-              <Text style={styles.loginButtonText}>Entrar</Text>
+              <Text style={styles.loginButtonText}>ENTRAR</Text>
             )}
           </TouchableOpacity>
 
@@ -114,9 +115,12 @@ export default function LoginScreen() {
           <View style={styles.createAccountContainer}>
             <Text style={styles.createAccountText}>
               Não possui conta?
-              <Text style={styles.createAccountLink}> Criar conta</Text>
+              <TouchableOpacity style={styles.createAccountLinkContainer} onPress={() => router.push("/(auth)/register")}>
+                <Text style={styles.createAccountLink}> Criar conta</Text>
+              </TouchableOpacity>
             </Text>
           </View>
+
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -203,10 +207,18 @@ const styles = StyleSheet.create({
   createAccountText: {
     color: "#666",
     fontSize: 16,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  createAccountLinkContainer : {
+    justifyContent: "flex-end",
+    alignItems: "flex-end",
   },
   createAccountLink: {
     color: theme.colors.primary,
     fontWeight: "bold",
+    marginBottom: -5,
+    fontSize: 16,
   },
   generalErrorText: {
     color: "red",

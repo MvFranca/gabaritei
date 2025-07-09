@@ -1,150 +1,149 @@
 "use client";
-import React from "react";
-import { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   StyleSheet,
   Text,
   View,
-  TextInput,
-  TouchableOpacity,
   SafeAreaView,
   KeyboardAvoidingView,
   Platform,
-  Pressable,
+  TouchableOpacity,
   Image,
+  Dimensions,
   ActivityIndicator,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
 import { FontAwesome } from "@expo/vector-icons";
-import { Stack } from "expo-router";
+import { router, Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { theme } from "@/src/theme";
-import { useLogin } from "@/src/hooks/auth/useLogin";
+import { useZodForm } from "@/src/hooks/form/useZodForm";
+import { registerSchema } from "@/src/schemas/registerSchema";
+import { FormInput } from "@/src/ds/FormInput";
+import { ScrollView } from "react-native";
+import { useRegister } from "@/src/hooks/auth/useRegister";
 
-const defaultError = "Email ou senha incorretos";
+const defaultError = "Erro ao tentar cadastrar";
 
 export default function RegisterScreen() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
 
-  const { handleLogin, error, loading } = useLogin();
+  const [showError, setShowError] = useState(false);
+  const { handleRegister, error, loading } = useRegister();
+
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useZodForm(registerSchema);
+
+  useEffect(() => {
+    if (showError) {
+      const timeout = setTimeout(() => {
+        setShowError(false);
+      }, 3000);
+      return () => clearTimeout(timeout);
+    }
+    setShowError(true);
+  }, [error]);
 
   return (
     <SafeAreaView style={styles.container}>
-      <Stack.Screen
-        options={{
-          headerShown: false,
-        }}
-      />
+      <Stack.Screen options={{ headerShown: false }} />
       <StatusBar style="auto" />
 
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={styles.keyboardAvoidingView}
       >
-        <Image
-          style={styles.logoContainer}
-          resizeMode="contain"
-          source={require("../../assets/images/logo-horizontal-gradiente.png")}
-        />
+        <View style={styles.centerContent}>
+          <View style={styles.containerLogo}>
+            <Image
+              style={styles.logo}
+              resizeMode="contain"
+              source={require("../../assets/images/logo-horizontal-gradiente.png")}
+            />
+          </View>
 
-        <View style={styles.formContainer}>
-          <View style={styles.containersInput}>
-            <View style={styles.inputContainer}>
-              <TextInput
-                style={styles.input}
-                placeholder="Digite seu usuário ou E-mail"
-                value={email}
-                onChangeText={setEmail}
-                autoCapitalize="none"
-              />
-            </View>
-            <View style={styles.inputContainer}>
-              <TextInput
-                style={styles.passwordInput}
-                placeholder="Senha"
-                value={password}
-                onChangeText={setPassword}
-                secureTextEntry={!showPassword}
-                autoCapitalize="none"
-              />
-              <Pressable
-                style={styles.eyeIcon}
-                onPress={() => setShowPassword(!showPassword)}
-              >
-                <Ionicons
-                  name={showPassword ? "eye-off-outline" : "eye-outline"}
-                  size={24}
-                  color="#999"
+          <ScrollView
+            style={styles.scrollView}
+            contentContainerStyle={styles.scrollContent}
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+          >
+            <View style={styles.formContainer}>
+              <View style={styles.containersInput}>
+                <FormInput
+                  control={control}
+                  name="name"
+                  placeholder="Nome completo"
                 />
-              </Pressable>
-            </View>
-          </View>
+                <FormInput
+                  control={control}
+                  name="email"
+                  placeholder="Digite seu e-mail"
+                />
+                <FormInput
+                  control={control}
+                  name="password"
+                  placeholder="Senha"
+                  secureTextEntry
+                  showToggleVisibility
+                />
+                <FormInput
+                  control={control}
+                  name="confirmPassword"
+                  placeholder="Confirmar senha"
+                  secureTextEntry
+                  showToggleVisibility
+                />
 
-          {error && (
-            <Text
-              style={{
-                color: "red",
-                marginTop: 10,
-                textAlign: "left",
-                fontWeight: "bold",
-              }}
-            >
-              {defaultError}
-            </Text>
-          )}
+              </View>
 
-          <TouchableOpacity
-            activeOpacity={0.7}
-            style={styles.forgotPasswordContainer}
-          >
-            <Text style={styles.forgotPasswordText}>Esqueceu sua senha?</Text>
-          </TouchableOpacity>
-
-          <View
-            style={{
-              flexDirection: "column",
-              marginBottom: 20,
-            }}
-          >
-            <TouchableOpacity
-              style={styles.loginButton}
-              activeOpacity={0.7}
-              onPress={() => handleLogin({ email, password })}
-            >
-              {loading ? (
-                <ActivityIndicator color={"#fff"} />
-              ) : (
-                <Text style={styles.loginButtonText}>AVANÇAR</Text>
+              {showError && error && (
+                <Text style={styles.generalErrorText}>{defaultError}</Text>
               )}
-            </TouchableOpacity>
-          </View>
 
-          <View style={styles.socialLoginContainer}>
-            <Text style={styles.socialLoginText}>Ou realize o login com:</Text>
-            <View style={styles.socialButtonsContainer}>
               <TouchableOpacity
+                style={styles.loginButton}
                 activeOpacity={0.7}
-                style={[styles.socialButton, styles.googleButton]}
+                onPress={handleSubmit(handleRegister)}
               >
-                <FontAwesome name="google" size={24} color="white" />
+                {loading ? (
+                  <ActivityIndicator color={"#fff"} />
+                ) : (
+                  <Text style={styles.loginButtonText}>CADASTRAR</Text>
+                )}
               </TouchableOpacity>
-              <TouchableOpacity
-                activeOpacity={0.7}
-                style={[styles.socialButton, styles.facebookButton]}
-              >
-                <FontAwesome name="facebook" size={24} color="white" />
-              </TouchableOpacity>
+
+              <View style={styles.socialLoginContainer}>
+                <Text style={styles.socialLoginText}>
+                  Ou use as suas redes:
+                </Text>
+                <View style={styles.socialButtonsContainer}>
+                  <TouchableOpacity
+                    style={[styles.socialButton, styles.googleButton]}
+                  >
+                    <FontAwesome name="google" size={24} color="white" />
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[styles.socialButton, styles.facebookButton]}
+                  >
+                    <FontAwesome name="facebook" size={24} color="white" />
+                  </TouchableOpacity>
+                </View>
+              </View>
+
+              <View style={styles.createAccountContainer}>
+                <Text style={styles.createAccountText}>
+                  Já possui conta?
+                  <TouchableOpacity
+                    onPress={() => router.push("/(auth)/login")}
+                  >
+                    <Text style={styles.createAccountLink}> Entrar</Text>
+                  </TouchableOpacity>
+                </Text>
+              </View>
             </View>
-          </View>
-
-          <View style={styles.createAccountContainer}>
-            <Text style={styles.createAccountText}>
-              Não possui conta?
-              <Text style={styles.createAccountLink}> Criar conta</Text>
-            </Text>
-          </View>
+          </ScrollView>
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -159,26 +158,36 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
   },
   keyboardAvoidingView: {
-    width: "100%",
+    flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    padding: 20,
     paddingHorizontal: 24,
   },
-  logoContainer: {
-    marginBottom: 50,
+  centerContent: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 24,
+  },
+  //revisar depois
+  scrollView: {
+    width: Dimensions.get("window").width,
+    paddingHorizontal: 24,
+    height: "75%",
+  },
+  scrollContent: {
+    gap: 12,
+    paddingBottom: 20,
+  },
+  containerLogo: {
+    height: "25%",
+    justifyContent: "flex-end",
+    alignItems: "center",
+    marginBottom: 30
+  },
+  logo: {
     width: 340,
     height: 100,
-  },
-  logoText: {
-    fontSize: 40,
-    fontWeight: "bold",
-    color: theme.colors.primary,
-  },
-  logoG: {
-    fontSize: 40,
-    fontWeight: "bold",
-    color: theme.colors.primary,
   },
   formContainer: {
     width: "100%",
@@ -186,45 +195,9 @@ const styles = StyleSheet.create({
   containersInput: {
     gap: 12,
   },
-  inputContainer: {
-    width: "100%",
-    position: "relative",
-    height: 45,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: "#808080",
-    borderRadius: 5,
-    paddingHorizontal: 16,
-    fontSize: 16,
-    height: 45,
-  },
-  passwordInput: {
-    borderWidth: 1,
-    borderColor: "#808080",
-    borderRadius: 5,
-    paddingHorizontal: 16,
-    height: 45,
-    fontSize: 16,
-    paddingRight: 50,
-  },
-  eyeIcon: {
-    position: "absolute",
-    right: 15,
-    top: 12,
-  },
-  forgotPasswordContainer: {
-    alignSelf: "flex-end",
-    marginBottom: 20,
-  },
-  forgotPasswordText: {
-    color: "#666",
-    fontSize: 16,
-  },
   loginButton: {
     backgroundColor: theme.colors.primary,
     borderRadius: 5,
-    paddingHorizontal: 16,
     height: 45,
     justifyContent: "center",
     alignItems: "center",
@@ -235,9 +208,15 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
   },
+  generalErrorText: {
+    color: "red",
+    marginTop: 10,
+    textAlign: "left",
+    fontWeight: "bold",
+  },
   socialLoginContainer: {
     alignItems: "center",
-    marginBottom: 20,
+    marginVertical: 20,
   },
   socialLoginText: {
     color: "#666",
@@ -273,5 +252,7 @@ const styles = StyleSheet.create({
   createAccountLink: {
     color: theme.colors.primary,
     fontWeight: "bold",
+    marginBottom: -5,
+    fontSize: 16,
   },
 });
