@@ -5,12 +5,18 @@ import LinearGradient from 'react-native-linear-gradient';
 type Props = {
   title: string;
   description: string;
+  theme?: string;
 };
 
-const CardSubModule = ({ title, description }: Props) => {
+const CardSubModule = ({ title, description, theme = 'primary' }: Props) => {
+  const gradientColors =
+    theme === 'primary'
+      ? ['#407BFF', '#3ABAFF']
+      : ['#B0B0B0', '#C0C0C0'];
+
   return (
     <LinearGradient
-      colors={['#407BFF', '#3ABAFF']}
+      colors={gradientColors}
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 1 }}
       style={styles.container}
@@ -20,6 +26,7 @@ const CardSubModule = ({ title, description }: Props) => {
     </LinearGradient>
   );
 };
+
 
 const styles = StyleSheet.create({
   container: {

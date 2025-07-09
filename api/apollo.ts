@@ -8,11 +8,11 @@ const httpLink = createHttpLink({
 });
 
 const authLink = setContext(async (_, { headers }) => {
-  const token = await SecureStore.getItemAsync('token');
+  const token = await SecureStore.deleteItemAsync('token');
   return {
     headers: {
       ...headers,
-      authorization: token ? `Bearer ${token}` : '',
+      // authorization: token ? `Bearer ${token}` : '',
     },
   };
 });

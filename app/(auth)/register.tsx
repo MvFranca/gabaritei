@@ -1,52 +1,42 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React from "react";
+import { useState } from "react";
 import {
   StyleSheet,
   Text,
   View,
+  TextInput,
+  TouchableOpacity,
   SafeAreaView,
   KeyboardAvoidingView,
   Platform,
-  TouchableOpacity,
+  Pressable,
   Image,
   ActivityIndicator,
 } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import { FontAwesome } from "@expo/vector-icons";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { theme } from "@/src/theme";
 import { useLogin } from "@/src/hooks/auth/useLogin";
-import { useZodForm } from "@/src/hooks/form/useZodForm";
-import { loginSchema } from "@/src/schemas/loginSchema";
-import { FormInput } from "@/src/ds/FormInput";
 
 const defaultError = "Email ou senha incorretos";
 
-export default function LoginScreen() {
-  const [showError, setShowError] = useState(false);
+export default function RegisterScreen() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+
   const { handleLogin, error, loading } = useLogin();
-
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-  } = useZodForm(loginSchema);
-
-
-  useEffect(() => {
-    if (showError) {
-      const timeout = setTimeout(() => {
-        setShowError(false);
-      }, 3000);
-      return () => clearTimeout(timeout);
-    }
-    setShowError(true);
-  }, [error]);
-
 
   return (
     <SafeAreaView style={styles.container}>
-      <Stack.Screen options={{ headerShown: false }} />
+      <Stack.Screen
+        options={{
+          headerShown: false,
+        }}
+      />
       <StatusBar style="auto" />
 
       <KeyboardAvoidingView
@@ -61,20 +51,49 @@ export default function LoginScreen() {
 
         <View style={styles.formContainer}>
           <View style={styles.containersInput}>
-            <FormInput
-              control={control}
-              name="email"
-              placeholder="Digite seu usuário ou E-mail"
-            />
-            <FormInput
-              control={control}
-              name="password"
-              placeholder="Senha"
-              secureTextEntry
-              showToggleVisibility
-            />
+            <View style={styles.inputContainer}>
+              <TextInput
+                style={styles.input}
+                placeholder="Digite seu usuário ou E-mail"
+                value={email}
+                onChangeText={setEmail}
+                autoCapitalize="none"
+              />
+            </View>
+            <View style={styles.inputContainer}>
+              <TextInput
+                style={styles.passwordInput}
+                placeholder="Senha"
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry={!showPassword}
+                autoCapitalize="none"
+              />
+              <Pressable
+                style={styles.eyeIcon}
+                onPress={() => setShowPassword(!showPassword)}
+              >
+                <Ionicons
+                  name={showPassword ? "eye-off-outline" : "eye-outline"}
+                  size={24}
+                  color="#999"
+                />
+              </Pressable>
+            </View>
           </View>
-          {showError && error && <Text style={styles.generalErrorText}>{defaultError}</Text>}
+
+          {error && (
+            <Text
+              style={{
+                color: "red",
+                marginTop: 10,
+                textAlign: "left",
+                fontWeight: "bold",
+              }}
+            >
+              {defaultError}
+            </Text>
+          )}
 
           <TouchableOpacity
             activeOpacity={0.7}
@@ -83,27 +102,36 @@ export default function LoginScreen() {
             <Text style={styles.forgotPasswordText}>Esqueceu sua senha?</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.loginButton}
-            activeOpacity={0.7}
-            onPress={handleSubmit(handleLogin)}
+          <View
+            style={{
+              flexDirection: "column",
+              marginBottom: 20,
+            }}
           >
-            {loading ? (
-              <ActivityIndicator color={"#fff"} />
-            ) : (
-              <Text style={styles.loginButtonText}>Entrar</Text>
-            )}
-          </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.loginButton}
+              activeOpacity={0.7}
+              onPress={() => handleLogin({ email, password })}
+            >
+              {loading ? (
+                <ActivityIndicator color={"#fff"} />
+              ) : (
+                <Text style={styles.loginButtonText}>AVANÇAR</Text>
+              )}
+            </TouchableOpacity>
+          </View>
 
           <View style={styles.socialLoginContainer}>
             <Text style={styles.socialLoginText}>Ou realize o login com:</Text>
             <View style={styles.socialButtonsContainer}>
               <TouchableOpacity
+                activeOpacity={0.7}
                 style={[styles.socialButton, styles.googleButton]}
               >
                 <FontAwesome name="google" size={24} color="white" />
               </TouchableOpacity>
               <TouchableOpacity
+                activeOpacity={0.7}
                 style={[styles.socialButton, styles.facebookButton]}
               >
                 <FontAwesome name="facebook" size={24} color="white" />
@@ -142,11 +170,48 @@ const styles = StyleSheet.create({
     width: 340,
     height: 100,
   },
+  logoText: {
+    fontSize: 40,
+    fontWeight: "bold",
+    color: theme.colors.primary,
+  },
+  logoG: {
+    fontSize: 40,
+    fontWeight: "bold",
+    color: theme.colors.primary,
+  },
   formContainer: {
     width: "100%",
   },
   containersInput: {
     gap: 12,
+  },
+  inputContainer: {
+    width: "100%",
+    position: "relative",
+    height: 45,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: "#808080",
+    borderRadius: 5,
+    paddingHorizontal: 16,
+    fontSize: 16,
+    height: 45,
+  },
+  passwordInput: {
+    borderWidth: 1,
+    borderColor: "#808080",
+    borderRadius: 5,
+    paddingHorizontal: 16,
+    height: 45,
+    fontSize: 16,
+    paddingRight: 50,
+  },
+  eyeIcon: {
+    position: "absolute",
+    right: 15,
+    top: 12,
   },
   forgotPasswordContainer: {
     alignSelf: "flex-end",
@@ -163,7 +228,7 @@ const styles = StyleSheet.create({
     height: 45,
     justifyContent: "center",
     alignItems: "center",
-    marginVertical: 16,
+    marginTop: 16,
   },
   loginButtonText: {
     color: "white",
@@ -172,6 +237,7 @@ const styles = StyleSheet.create({
   },
   socialLoginContainer: {
     alignItems: "center",
+    marginBottom: 20,
   },
   socialLoginText: {
     color: "#666",
@@ -206,11 +272,6 @@ const styles = StyleSheet.create({
   },
   createAccountLink: {
     color: theme.colors.primary,
-    fontWeight: "bold",
-  },
-  generalErrorText: {
-    color: "red",
-    textAlign: "left",
     fontWeight: "bold",
   },
 });

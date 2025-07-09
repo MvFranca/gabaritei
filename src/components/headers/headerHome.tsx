@@ -122,9 +122,7 @@ const HeaderHome = () => {
 
 const styles = StyleSheet.create({
 container: {
-  position: 'absolute',
-  top: 0,
-  left: 0,
+
   width: Dimensions.get('window').width,
   height: 114,
   backgroundColor: theme.colors.surface,
@@ -138,6 +136,7 @@ container: {
   shadowOffset: { width: 0, height: 2 },
   shadowOpacity: 0.1,
   shadowRadius: 4,
+  position: 'relative'
 },
 
   iconButton: {

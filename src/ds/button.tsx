@@ -1,6 +1,6 @@
+import { theme } from '@/src/theme';
 import React from 'react';
 import { TouchableOpacity, Text, StyleSheet, View, StyleProp, ViewStyle } from 'react-native';
-import { theme } from '../theme';
 
 type HomeButtonProps = {
   text: string;

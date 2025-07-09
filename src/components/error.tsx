@@ -1,7 +1,7 @@
 import { Image, Text, View } from "react-native";
-import Button from "./button";
 import { StyleSheet } from "react-native";
 import { theme } from "../theme";
+import Button from "../ds/button";
 
 const ErrorComponent = () => {
   return (
