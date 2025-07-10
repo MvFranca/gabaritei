@@ -20,7 +20,7 @@ export function useLogin() {
       const token = data?.signin?.token;
       if (token) {
         await SecureStore.setItemAsync("token", token);
-        router.replace("/quiz");
+        router.replace("/home");
       }
     } catch (e) {
       console.error("Login failed:", e);

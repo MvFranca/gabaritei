@@ -4,8 +4,14 @@ import { tabBarItems } from '../utils/tabBar';
 import { theme } from '../theme';
 
 import { Image } from 'expo-image';
+import { useLoading } from '../context/LoadingContext';
+
+
 
 const TabBar = ({ state, descriptors, navigation }: BottomTabBarProps) => {
+
+  const { isLoading } = useLoading();
+
   const routesWithMeta = state.routes
     .map((route, index) => {
       const tab = tabBarItems.find(item => route.name.includes(item.route));
@@ -20,7 +26,7 @@ const TabBar = ({ state, descriptors, navigation }: BottomTabBarProps) => {
     .sort((a, b) => a.order - b.order); 
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, (isLoading || !routesWithMeta[routesWithMeta.length - 1]) && { display: "none" }]}>
       {routesWithMeta.map((route, idx) => {
         const isFocused = state.index === route.index;
 

@@ -9,32 +9,20 @@ import {
 } from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
-import BottomSheetCustom from '../bottomSheetCustom';
 import { theme } from '@/src/theme';
 
-const subjects = ['Matemática', 'Português', 'História'];
+type Props = {
+  setIsSheetOpen: (value: boolean) => void;
+  selectedSubject: string;
+};
 
-const HeaderHome = () => {
-  const [isSheetOpen, setIsSheetOpen] = useState(false);
-  const [selectedSubject, setSelectedSubject] = useState('Matemática');
+const HeaderHome = ({
+  setIsSheetOpen,
+  selectedSubject,
+}: Props) => {
+
   const fadeAnim = useRef(new Animated.Value(1)).current;
 
-  const handleSelectSubject = (subject: string) => {
-    Animated.timing(fadeAnim, {
-      toValue: 0,
-      duration: 100,
-      useNativeDriver: true,
-    }).start(() => {
-      setSelectedSubject(subject);
-      fadeAnim.setValue(0);
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 150,
-        useNativeDriver: true,
-      }).start();
-      setIsSheetOpen(false);
-    });
-  };
 
   return (
     <>
@@ -67,55 +55,6 @@ const HeaderHome = () => {
           />
         </TouchableOpacity>
       </View>
-
-      <BottomSheetCustom
-        isOpen={isSheetOpen}
-        onClose={() => setIsSheetOpen(false)}
-
-      >
-        <View style={styles.bottomSheetHeaderContainer}>
-          <MaterialCommunityIcons
-            name="book-open-page-variant"
-            size={20}
-            color={theme.colors.textPrimary}
-          />
-          <Text style={styles.sheetTitle}>Escolha uma matéria</Text>
-        </View>
-
-        {subjects.map(subject => {
-          const isSelected = selectedSubject === subject;
-
-          return (
-            <TouchableOpacity
-              key={subject}
-              style={[
-                styles.sheetButton,
-                isSelected && { backgroundColor: theme.colors.primary },
-              ]}
-              onPress={() => handleSelectSubject(subject)}
-            >
-              <View style={styles.subjectRow}>
-                <Text
-                  style={[
-                    styles.sheetButtonText,
-                    isSelected && { color: theme.colors.surface },
-                  ]}
-                >
-                  {subject}
-                </Text>
-                {isSelected && (
-                  <Ionicons
-                    name="checkmark"
-                    size={18}
-                    color="#fff"
-                    style={{ marginLeft: 8 }}
-                  />
-                )}
-              </View>
-            </TouchableOpacity>
-          );
-        })}
-      </BottomSheetCustom>
     </>
   );
 };
@@ -181,34 +120,7 @@ container: {
     fontWeight: 'bold',
     fontSize: 16,
   },
-  bottomSheetHeaderContainer: {
-    flexDirection: 'row',
-    gap: 8,
-    alignItems: 'center',
-    marginVertical: 16,
-  },
-  sheetTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: theme.colors.textPrimary,
-  },
-  sheetButton: {
-    backgroundColor: '#E3F2FD',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-    marginBottom: 10,
-  },
-  sheetButtonText: {
-    color: theme.colors.textPrimary,
-    fontWeight: '500',
-    fontSize: 16,
-  },
-  subjectRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
+
 });
 
 export default HeaderHome;

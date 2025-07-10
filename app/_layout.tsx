@@ -5,6 +5,7 @@ import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import * as SecureStore from "expo-secure-store";
+import { LoadingProvider } from "@/src/context/LoadingContext";
 
 export default function RootLayout() {
   useEffect(() => {
@@ -12,7 +13,7 @@ export default function RootLayout() {
       const token = await SecureStore.getItemAsync("token");
 
       if (token) {
-        router.replace("/login");
+        router.replace("/home");
       } else {
         router.replace("/login");
       }
@@ -23,10 +24,12 @@ export default function RootLayout() {
 
   return (
     <ApolloProvider client={apolloClient}>
-      <GestureHandlerRootView style={{ flex: 1 }}>
-        <StatusBar style="auto" />
-        <Slot />
-      </GestureHandlerRootView>
+      <LoadingProvider>
+        <GestureHandlerRootView style={{ flex: 1 }}>
+          <StatusBar style="auto" />
+          <Slot />
+        </GestureHandlerRootView>
+      </LoadingProvider>
     </ApolloProvider>
   );
 }

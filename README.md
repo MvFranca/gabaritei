@@ -10,12 +10,18 @@ This is an [Expo](https://expo.dev) project created with [`create-expo-app`](htt
    npm install
    ```
 
-2. Start the app
+2. Start the Metro bundler
 
    ```bash
-    npx expo start
+   npx expo start --dev-client --clear
    ```
 
+3. In a separate terminal, start the Android app
+
+   ```bash
+   npx expo run:android
+   ```
+   
 In the output, you'll find options to open the app in a
 
 - [development build](https://docs.expo.dev/develop/development-builds/introduction/)
